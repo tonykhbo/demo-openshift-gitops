@@ -1,0 +1,38 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: create-argo-app
+  namespace: test
+spec:
+  description: >-
+    This task creates an argo app.
+  params:
+    - default: '4.6'
+      description: The OpenShift Version to use
+      name: VERSION
+      type: string
+  steps:
+    - image: 'quay.io/openshift/origin-cli:$(params.VERSION)'
+      name: create-argo-app
+      resources: {}
+      script: |
+        oc apply -f - << EOF
+        apiVersion: argoproj.io/v1alpha1
+        kind: Application
+        metadata:
+          name: guestbook
+          namespace: openshift-gitops
+        spec:
+          destination:
+            name: ''
+            namespace: guestbook
+            server: 'https://kubernetes.default.svc'
+          source:
+            path: helm-guestbook
+            repoURL: 'https://github.com/argoproj/argocd-example-apps.git'
+            targetRevision: HEAD
+          project: default
+          syncPolicy:
+            syncOptions:
+              - CreateNamespace=true
+        EOF
