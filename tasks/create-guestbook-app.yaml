@@ -2,7 +2,7 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: create-argo-app
-  namespace: test
+  namespace: openshift-gitops
 spec:
   description: >-
     This task creates an argo app.
